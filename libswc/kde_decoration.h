@@ -1,7 +1,17 @@
-/* swc: libswc/kde_decoration.h
+/**
+ * \file kde_decoration.h
+ * \brief KDE server-side decoration manager for swc.
  *
- * Copyright (c) 2020 Michael Forney
+ * \author Michael Forney
+ * \date 2020
+ * \copyright MIT
  *
+ * This header declares the creation function for the KDE server-side decoration
+ * manager global. The manager advertises support for the
+ * org_kde_kwin_server_decoration_manager protocol to Wayland clients.
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -26,6 +36,15 @@
 
 struct wl_display;
 
+/**
+ * \brief Creates and registers the KDE server-side decoration manager global.
+ *
+ * Advertises the org_kde_kwin_server_decoration_manager protocol to Wayland
+ * clients.
+ *
+ * \param[in] display The Wayland display to attach the global to.
+ * \return A pointer to the created wl_global, or NULL on failure.
+ */
 struct wl_global *kde_decoration_manager_create(struct wl_display *display);
 
 #endif
