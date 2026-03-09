@@ -67,9 +67,9 @@ struct event {
  * This function handles the boilerplate of initializing an event and calling \c
  * wl_signal_emit.
  *
- * \param signal The Wayland signal to emit.
- * \param type The compositor-specific event type ID.
- * \param event_data The data payload to attach to the event.
+ * \param[in,out] signal The Wayland signal to emit.
+ * \param[in] type The compositor-specific event type ID.
+ * \param[in] event_data The data payload to attach to the event.
  */
 static inline void
 send_event(struct wl_signal *signal, uint32_t type, void *event_data)
