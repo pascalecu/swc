@@ -1,7 +1,17 @@
-/* swc: libswc/panel_manager.h
+/**
+ * \file panel_manager.h
+ * \brief Wayland panel manager global.
+ * \author Michael Forney
+ * \date 2014–-2019
+ * \copyright MIT
  *
- * Copyright (c) 2013-2019 Michael Forney
- *
+ * This module exposes the compositor's panel management interface to
+ * Wayland clients through the `swc_panel_manager` global. Clients use
+ * this interface to create panel surfaces associated with existing
+ * Wayland surfaces.
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -26,6 +36,15 @@
 
 struct wl_display;
 
+/**
+ * \brief Create the panel manager global.
+ *
+ * Registers the `swc_panel_manager` global on the given Wayland display,
+ * allowing clients to request panel objects.
+ *
+ * \param display Wayland display to register the global on.
+ * \return The created wl_global object, or NULL on failure.
+ */
 struct wl_global *panel_manager_create(struct wl_display *display);
 
 #endif
