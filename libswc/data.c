@@ -166,7 +166,17 @@ data_destroy(struct wl_resource *source)
 }
 
 /**
- * \brief Create a new wl_data_source resource.
+ * \brief Create a new wl_data_source object.
+ *
+ * Allocates and initializes a data source for clipboard or drag-and-drop
+ * operations. The data source is associated with the given client.
+ *
+ * \param[in] client The client creating the data source.
+ * \param[in] version Protocol version to use.
+ * \param[in] id Object ID for the new wl_data_source resource.
+ * \return The created wl_resource, or NULL on allocation failure.
+ *
+ * \see https://wayland.freedesktop.org/docs/html/apa.html#protocol-spec-wl_data_source
  */
 struct wl_resource *
 data_source_new(struct wl_client *client, uint32_t version, uint32_t id)
@@ -189,7 +199,16 @@ data_source_new(struct wl_client *client, uint32_t version, uint32_t id)
 }
 
 /**
- * \brief Create a new wl_data_offer resource.
+ * \brief Create a new wl_data_offer object.
+ *
+ * Creates a client-visible data offer backed by the given wl_data_source.
+ *
+ * \param[in] client The client receiving the offer.
+ * \param[in] source The wl_data_source providing the data.
+ * \param[in] version Protocol version to use.
+ * \return The created wl_resource representing the offer, or NULL on failure.
+ *
+ * \see https://wayland.freedesktop.org/docs/html/apa.html#protocol-spec-wl_data_offer
  */
 struct wl_resource *
 data_offer_new(struct wl_client *client, struct wl_resource *source, uint32_t version)
@@ -210,6 +229,9 @@ data_offer_new(struct wl_client *client, struct wl_resource *source, uint32_t ve
 
 /**
  * \brief Send all MIME types from a data source to a data offer.
+ *
+ * \param[in] source The wl_data_source resource.
+ * \param[in] offer The wl_data_offer resource.
  */
 void
 data_send_mime_types(struct wl_resource *source, struct wl_resource *offer)

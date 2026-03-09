@@ -395,13 +395,18 @@ bind_dmabuf(struct wl_client *client, void *data, uint32_t version, uint32_t id)
 }
 
 /**
- * \brief Initializes and registers the dmabuf Wayland global.
+ * \brief Initializes and registers the zwp_linux_dmabuf_v1 global.
  *
- * Advertises version 3 of the `zwp_linux_dmabuf_v1` protocol to the
- * display server, exposing modifier support.
+ * This function sets up the linux-dmabuf Wayland protocol extension and binds
+ * it to the provided Wayland display. Once registered, connected clients can
+ * discover the global, query supported DRM formats and modifiers, and begin
+ * negotiating DMA-BUF imports.
  *
- * \param[in] display The core Wayland display instance.
- * \return A pointer to the registered `wl_global` object, or NULL if registration fails.
+ * \param[in] display The core Wayland display instance where the global will
+ * be advertised.
+ *
+ * \return A pointer to the newly created `wl_global` object representing the
+ * extension, or `NULL` if resource allocation or registration fails.
  */
 struct wl_global *
 swc_dmabuf_create(struct wl_display *display)

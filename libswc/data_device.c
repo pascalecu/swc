@@ -150,12 +150,12 @@ handle_selection_destroy(struct wl_listener *listener, void *data)
 }
 
 /**
- * \brief Allocate and initialize a new data device.
+ * \brief Create a new data device.
  *
- * Initializes selection tracking, event signals, and the list of client
- * resources.
+ * Initializes a compositor-side data device used to manage clipboard selections
+ * and client \c wl_data_device resources.
  *
- * \return Pointer to the new \c data_device, or \c NULL on allocation failure.
+ * \return The newly created \ref data_device, or \c NULL on allocation failure.
  */
 struct data_device *
 data_device_create(void)
@@ -177,7 +177,10 @@ data_device_create(void)
 }
 
 /**
- * \brief Destroy a data device and all bound client resources.
+ * \brief Destroy a data device.
+ *
+ * All \c wl_data_device resources associated with the device are destroyed
+ * before the structure itself is freed.
  *
  * \param[in] data_device Data device to destroy.
  */
@@ -197,18 +200,18 @@ data_device_destroy(struct data_device *data_device)
 }
 
 /**
- * \brief Bind a wl_data_device resource for a client.
+ * \brief Bind a \c wl_data_device resource for a client.
  *
- * Creates a client-visible wl_data_device and adds it to the data device's
- * resource list.
+ * Creates the client-visible \c wl_data_device protocol object and associates
+ * it with the compositor-side \ref data_device.
  *
- * \param[in] data_device Data device instance.
+ * \param[in] data_device Data device being bound.
  * \param[in] client Client requesting the binding.
- * \param[in] version Protocol version requested.
- * \param[in] id Object ID for the created resource.
+ * \param[in] version Protocol version requested by the client.
+ * \param[in] id Object ID for the created \c wl_data_device resource.
  *
- * \return The new \c wl_resource representing the wl_data_device, or NULL on
- * failure.
+ * \return The created \c wl_resource representing the \c wl_data_device, or \c
+ * NULL on allocation failure.
  */
 struct wl_resource *
 data_device_bind(struct data_device *data_device, struct wl_client *client, uint32_t version, uint32_t id)
@@ -256,13 +259,13 @@ new_offer(struct wl_resource *resource, struct wl_client *client, struct wl_reso
 }
 
 /**
- * \brief Offer the current selection to a client.
+ * \brief Offer the current clipboard selection to a client.
  *
- * If a selection exists, a new wl_data_offer is created and sent to the
- * client's wl_data_device resource.
+ * If a selection exists, a \c wl_data_offer is created and sent to the client's
+ * \c wl_data_device resource.
  *
  * \param[in] data_device Data device providing the selection.
- * \param[in] client Client to receive the offer.
+ * \param[in] client Client receiving the selection offer.
  */
 void
 data_device_offer_selection(struct data_device *data_device, struct wl_client *client)
