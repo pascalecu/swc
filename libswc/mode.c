@@ -1,7 +1,17 @@
-/* swc: libswc/mode.c
+/**
+ * \file mode.c
+ * \brief Display mode helpers.
  *
- * Copyright (c) 2013 Michael Forney
+ * \author Michael Forney
+ * \date 2013
+ * \copyright MIT
  *
+ * Implementation of helpers for working with DRM display modes.
+ * Provides initialization and comparison utilities for the
+ * \ref mode structure defined in mode.h.
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -23,8 +33,18 @@
 
 #include "mode.h"
 
+/**
+ * \brief Initialize a mode from a DRM mode description.
+ *
+ * \param mode Destination mode structure.
+ * \param mode_info Source DRM mode.
+ *
+ * Copies relevant fields from \p mode_info into \p mode.
+ *
+ * \return true on success.
+ */
 bool
-mode_initialize(struct mode *mode, drmModeModeInfo *mode_info)
+mode_initialize(struct mode *mode, const drmModeModeInfo *mode_info)
 {
 	mode->width = mode_info->hdisplay;
 	mode->height = mode_info->vdisplay;
@@ -34,10 +54,20 @@ mode_initialize(struct mode *mode, drmModeModeInfo *mode_info)
 	return true;
 }
 
+/**
+ * \brief Compare two modes for equality.
+ *
+ * Two modes are considered equal if their resolution and refresh rate match.
+ *
+ * \param mode1 First mode.
+ * \param mode2 Second mode.
+ *
+ * \return true if the modes are equivalent.
+ */
 bool
 mode_equal(const struct mode *mode1, const struct mode *mode2)
 {
 	return mode1->width == mode2->width
-	    && mode1->height == mode2->height
-	    && mode1->refresh == mode2->refresh;
+	       && mode1->height == mode2->height
+	       && mode1->refresh == mode2->refresh;
 }
