@@ -75,12 +75,58 @@
  * completion for that screen.
  */
 struct target {
+	/**
+	 * \brief The underlying \c wld surface for this target.
+	 * \details
+	 * This is the primary drawing surface where the compositor
+	 * renders the final scene for this specific screen.
+	 */
 	struct wld_surface *surface;
-	struct wld_buffer *next_buffer, *current_buffer;
+
+	/**
+	 * \brief The buffer currently being displayed on the screen.
+	 * \details
+	 * This buffer is owned by the hardware/display
+	 * controller until a page flip completes.
+	 */
+	struct wld_buffer *current_buffer;
+
+	/**
+	 * \brief The buffer being prepared for the next frame.
+	 * \details
+	 * Once rendering is complete, this buffer is submitted to the DRM subsystem
+	 * for the next page flip.
+	 */
+	struct wld_buffer *next_buffer;
+
+	/**
+	 * \brief The hardware plane or screen view associated with this target.
+	 * \details Usually points to the primary plane of a screen.
+	 */
 	struct view *view;
+
+	/**
+	 * \brief Handler for frame completion events.
+	 * \details
+	 * Linked into the view's handler list to receive notifications when a frame
+	 * is finished (e.g., after a DRM page flip).
+	 */
 	struct view_handler view_handler;
+
+	/**
+	 * \brief Bitmask identifying the screen(s) this target represents.
+	 * \details
+	 * Used to match views to specific outputs during the compositor's
+	 * visibility and damage calculations.
+	 */
 	uint32_t mask;
 
+	/**
+	 * \brief Cleanup listener for screen destruction.
+	 * \details
+	 * Ensures the target resources are freed if the associated screen is
+	 * disconnected or removed.
+	 */
 	struct wl_listener screen_destroy_listener;
 };
 
