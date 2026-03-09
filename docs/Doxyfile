@@ -119,7 +119,7 @@ FILE_PATTERNS          = *.c \
                          *.markdown \
                          *.md
 RECURSIVE              = YES
-EXCLUDE                = ../protocol
+EXCLUDE                = protocol
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        =
