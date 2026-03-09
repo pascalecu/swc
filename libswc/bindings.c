@@ -184,21 +184,18 @@ handle_binding(uint32_t time, struct press *press, uint32_t state, struct bindin
 	struct binding *binding;
 
 	if (state) {
-		/* Resolve using the seat's current modifier mask. */
+		/* Press: look up binding using current modifiers and store for release */
 		binding = find_binding(swc.seat->keyboard->modifiers, press->value);
-
-		if (!binding)
-			return false;
-
-		/* Remember the binding until release. */
 		press->data = binding;
 	} else {
-		/* On release, the binding pointer was stored in press->data. */
+		/* Release: reuse previously stored binding */
 		binding = press->data;
 	}
 
-	binding->handler(binding->data, time, binding->value, state);
+	if (!binding)
+		return false;
 
+	binding->handler(binding->data, time, binding->value, state);
 	return true;
 }
 
