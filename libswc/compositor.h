@@ -5,7 +5,6 @@
  * \date 2013--2014
  * \copyright MIT
  *
- * \details
  * This header defines the compositor and compositor-specific view structures
  * used by swc. It provides functions to initialize and finalize the compositor,
  * create and destroy compositor views, manage visibility and borders, and
@@ -47,7 +46,6 @@
  * \struct swc_compositor
  * \brief Represents the compositor and its core input and signal interfaces.
  *
- * \details
  * The compositor manages pointer input and emits signals when surfaces are
  * created. Compositor views are associated with the surfaces managed by the
  * compositor.
@@ -85,7 +83,6 @@ void compositor_finalize(void);
  * \struct compositor_view
  * \brief Represents a compositor-managed view associated with a surface.
  *
- * \details
  * Each compositor view wraps a base view and tracks compositor-specific
  * properties such as visibility, borders, clipping, and parent-child
  * relationships.

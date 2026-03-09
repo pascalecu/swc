@@ -5,7 +5,6 @@
  * \date 2013
  * \copyright MIT
  *
- * \details
  * This header defines the structures and functions used to manage
  * key and pointer bindings in swc. It provides access to the
  * keyboard and pointer handlers, and allows initialization and
@@ -47,7 +46,6 @@
  * \struct swc_bindings
  * \brief Exposes keyboard and pointer handlers for the seat.
  *
- * \details
  * This struct provides the public interface to the keyboard and pointer
  * binding subsystem. The seat forwards input events to these handlers, which
  * then invoke any registered key or button bindings.
@@ -61,7 +59,6 @@ struct swc_bindings {
  * \brief Initialize the binding subsystem.
  * \return true on success, false on failure.
  *
- * \details
  * This function must be called during compositor initialization before
  * registering any key or pointer bindings. It sets up internal storage
  * for the bindings arrays.
@@ -71,7 +68,6 @@ bool bindings_initialize(void);
 /**
  * \brief Finalize the binding subsystem.
  *
- * \details
  * Releases internal resources used for storing key and button bindings.
  * After this call, no binding handlers will be invoked.
  */

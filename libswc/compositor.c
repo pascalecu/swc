@@ -5,7 +5,6 @@
  * \date 2013--2020
  * \copyright MIT
  *
- * \details
  * This file implements the compositor core used by swc.  It manages the set
  * of compositor views, calculates damage and clipping regions, schedules and
  * performs updates, handles rendering to screen targets, and wires compositor
@@ -68,7 +67,6 @@
  * \struct target
  * \brief Per-screen rendering target and its associated view state.
  *
- * \details
  * A \c target holds the wld surface used for rendering to a particular
  * screen, the current and next buffers for page-flip handling, and a link
  * into the view handler system so the compositor can be notified of frame
@@ -77,7 +75,7 @@
 struct target {
 	/**
 	 * \brief The underlying \c wld surface for this target.
-	 * \details
+	 *
 	 * This is the primary drawing surface where the compositor
 	 * renders the final scene for this specific screen.
 	 */
@@ -85,7 +83,7 @@ struct target {
 
 	/**
 	 * \brief The buffer currently being displayed on the screen.
-	 * \details
+	 *
 	 * This buffer is owned by the hardware/display
 	 * controller until a page flip completes.
 	 */
@@ -93,7 +91,7 @@ struct target {
 
 	/**
 	 * \brief The buffer being prepared for the next frame.
-	 * \details
+	 *
 	 * Once rendering is complete, this buffer is submitted to the DRM subsystem
 	 * for the next page flip.
 	 */
@@ -101,13 +99,13 @@ struct target {
 
 	/**
 	 * \brief The hardware plane or screen view associated with this target.
-	 * \details Usually points to the primary plane of a screen.
+	 *  Usually points to the primary plane of a screen.
 	 */
 	struct view *view;
 
 	/**
 	 * \brief Handler for frame completion events.
-	 * \details
+	 *
 	 * Linked into the view's handler list to receive notifications when a frame
 	 * is finished (e.g., after a DRM page flip).
 	 */
@@ -115,7 +113,7 @@ struct target {
 
 	/**
 	 * \brief Bitmask identifying the screen(s) this target represents.
-	 * \details
+	 *
 	 * Used to match views to specific outputs during the compositor's
 	 * visibility and damage calculations.
 	 */
@@ -123,7 +121,7 @@ struct target {
 
 	/**
 	 * \brief Cleanup listener for screen destruction.
-	 * \details
+	 *
 	 * Ensures the target resources are freed if the associated screen is
 	 * disconnected or removed.
 	 */
@@ -842,7 +840,6 @@ compositor_view_set_border_color(struct compositor_view *view, uint32_t color)
 /**
  * \brief Recalculate compositor damage and opaque regions from visible views.
  *
- * \details
  * Walks the view stack top-down, computes per-view clip regions, accumulates
  * surface damage into the global compositor damage region, and handles border
  * damage.

@@ -43,7 +43,6 @@
 /**
  * \brief Represents a single key or button binding.
  *
- * \details
  * A binding associates a key/button value and a modifier mask with a
  * handler callback. Bindings with modifier set to SWC_MOD_ANY match
  * regardless of the current modifier state.
@@ -109,7 +108,6 @@ find_binding(struct wl_array *bindings, uint32_t modifiers, uint32_t value)
 /**
  * \brief Find a key binding for the given physical key and modifier mask.
  *
- * \details
  * Keys are resolved to keysyms using the current xkb state. This function first
  * tries the keysym produced by the current keyboard state (respecting layout
  * and modifiers). If that fails it falls back to the keysym at shift-level 0
@@ -172,7 +170,6 @@ find_button_binding(uint32_t modifiers, uint32_t value)
  * press.
  * \return true if the event was handled by a binding, false otherwise.
  *
- * \details
  * On press, this resolves the binding using \p find_binding with the
  * current keyboard modifier mask (from the seat). If a binding is found it
  * stores it in \c press->data and invokes the handler. On release it retrieves
@@ -277,7 +274,6 @@ swc_add_binding(enum swc_binding_type type, uint32_t modifiers, uint32_t value, 
  * \brief Initialize the binding subsystem.
  * \return true on success, false on failure.
  *
- * \details
  * This function must be called during compositor initialization before
  * registering any key or pointer bindings. It sets up internal storage
  * for the bindings arrays.
@@ -294,7 +290,6 @@ bindings_initialize(void)
 /**
  * \brief Finalize the binding subsystem.
  *
- * \details
  * Releases internal resources used for storing key and button bindings.
  * After this call, no binding handlers will be invoked.
  */

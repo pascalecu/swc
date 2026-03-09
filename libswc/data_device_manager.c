@@ -5,7 +5,6 @@
  * \date 2013--2020
  * \copyright MIT
  *
- * \details
  * This module provides the compositor-side implementation of the
  * wl_data_device_manager interface used for clipboard and drag-and-drop data
  * transfers between Wayland clients.
@@ -52,7 +51,7 @@
 
 /**
  * \brief Handle wl_data_device_manager.create_data_source.
- * \details
+ *
  * Creates a new wl_data_source object owned by the requesting client.
  * The data source represents a provider of clipboard or drag-and-drop
  * data that may later be offered to other clients.
@@ -71,7 +70,7 @@ create_data_source(struct wl_client *client, struct wl_resource *resource, uint3
 
 /**
  * \brief Handle wl_data_device_manager.get_data_device.
- * \details
+ *
  * Returns a wl_data_device associated with the specified wl_seat. The data
  * device allows the client to participate in clipboard and drag-and-drop
  * operations for that seat.
@@ -100,7 +99,7 @@ static const struct wl_data_device_manager_interface data_device_manager_impl = 
 
 /**
  * \brief Bind the wl_data_device_manager global to a client.
- * \details
+ *
  * Called by the Wayland server when a client binds the wl_data_device_manager
  * global advertised in the registry.
  *
@@ -130,7 +129,7 @@ bind_data_device_manager(struct wl_client *client, void *data, uint32_t version,
 
 /**
  * \brief Create the wl_data_device_manager global.
- * \details
+ *
  * Registers the wl_data_device_manager interface with the Wayland display so
  * that clients can bind to it through the registry.
  *

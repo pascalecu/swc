@@ -7,7 +7,6 @@
  * \date 2013–2019
  * \copyright MIT
  *
- * \details
  * This module exposes the compositor-side implementation of the Wayland \c
  * wl_data_device_manager global interface.
  *
@@ -60,7 +59,7 @@ struct wl_display;
 
 /**
  * \brief Create the wl_data_device_manager global.
- * \details
+ *
  * Registers the wl_data_device_manager interface with the Wayland display so
  * that clients can bind to it through the registry.
  *
