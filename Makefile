@@ -15,13 +15,17 @@ OBJCOPY         ?= objcopy
 PKG_CONFIG      ?= pkg-config
 WAYLAND_SCANNER ?= wayland-scanner
 
+DOCDIR      := docs
+DOXYFILE    := $(DOCDIR)/Doxyfile
+DOC_OUTPUT  := $(DOCDIR)/html
+
 VERSION_MAJOR   := 0
 VERSION_MINOR   := 0
 VERSION         := $(VERSION_MAJOR).$(VERSION_MINOR)
 
 TARGETS         := swc.pc
 SUBDIRS         := launch libswc protocol cursor example
-CLEAN_FILES     := $(TARGETS)
+CLEAN_FILES     := $(TARGETS) $(DOC_OUTPUT)
 
 include config.mk
 
@@ -112,12 +116,16 @@ swc.pc: swc.pc.in
 install-swc.pc: swc.pc | $(DESTDIR)$(PKGCONFIGDIR)
 	install -m 644 $< $(DESTDIR)$(PKGCONFIGDIR)
 
+.PHONY: docs
+docs: $(DOXYFILE)
+	$(Q_GEN)doxygen $<
+
 .PHONY: install
 install: $(SUBDIRS:%=install-%) $(TARGETS:%=install-%)
 
 .PHONY: clean
 clean:
-	rm -f $(CLEAN_FILES)
+	rm -rf $(CLEAN_FILES)
 
 -include .deps/*/*.d
 
