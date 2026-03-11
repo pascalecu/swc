@@ -1,7 +1,15 @@
-/* swc: libswc/plane.h
+/**
+ * \file plane.h
+ * \brief Hardware plane management for swc.
+ * \author Michael Forney
+ * \date 2019
+ * \copyright MIT
  *
- * Copyright (c) 2019 Michael Forney
- *
+ * This file defines the plane structure and its associated lifecycle functions.
+ * It wraps DRM planes to be used as compositor views.
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,17 +37,31 @@
 
 #include <wayland-server.h>
 
+/**
+ * \brief Represents a hardware DRM plane mapped to a compositor view.
+ */
 struct plane {
-	struct view view;
-	struct screen *screen;
-	uint32_t id, fb;
-	int type;
-	uint32_t possible_crtcs;
-	struct wl_listener swc_listener;
-	struct wl_list link;
+	struct view view;                /**< The base view structure. */
+	struct screen *screen;           /**< The screen this plane is attached to. */
+	uint32_t id;                     /**< The DRM object ID of the plane. */
+	uint32_t fb;                     /**< The DRM framebuffer ID currently attached. */
+	int type;                        /**< The DRM plane type (e.g., Overlay, Primary, Cursor). */
+	uint32_t possible_crtcs;         /**< Bitmask of CRTCs this plane can be used with. */
+	struct wl_listener swc_listener; /**< Listener for global SWC events. */
+	struct wl_list link;             /**< List node for compositor plane lists. */
 };
 
+/**
+ * \brief Allocates and initializes a new hardware plane.
+ * \param id The DRM object ID for the plane.
+ * \return A pointer to the newly allocated plane, or NULL on failure.
+ */
 struct plane *plane_new(uint32_t id);
+
+/**
+ * \brief Destroys a plane and frees associated resources.
+ * \param plane The plane to destroy.
+ */
 void plane_destroy(struct plane *plane);
 
 #endif
