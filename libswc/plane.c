@@ -187,11 +187,13 @@ get_plane_type(int fd, struct plane *plane, drmModeObjectProperties *props)
 		if (!prop)
 			continue;
 
-		if (strcmp(prop->name, "type") == 0) {
+		int index = find_prop_index(prop->name);
+		if (index == PLANE_TYPE) {
 			plane->type = props->prop_values[i];
 			drmModeFreeProperty(prop);
 			break;
 		}
+
 		drmModeFreeProperty(prop);
 	}
 }
