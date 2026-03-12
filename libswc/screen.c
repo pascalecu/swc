@@ -1,7 +1,16 @@
-/* swc: libswc/screen.c
+/**
+ * \file screen.c
+ * \brief Screen management and initialization for the SWC Wayland compositor.
+ * \author Michael Forney
+ * \date 2013–2014
+ * \copyright MIT
  *
- * Copyright (c) 2013, 2014 Michael Forney
- *
+ * This file handles the creation, destruction, and geometry management of
+ * physical screens (displays) managed by the compositor, including their
+ * Wayland protocol bindings and pointer interactions.
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -31,8 +40,8 @@
 #include "pointer.h"
 #include "util.h"
 
-#include <stdlib.h>
 #include "swc-server-protocol.h"
+#include <stdlib.h>
 
 #define INTERNAL(s) ((struct screen *)(s))
 
@@ -45,15 +54,27 @@ struct pointer_handler screens_pointer_handler = {
 	.motion = handle_motion,
 };
 
+/**
+ * \brief Assigns a custom handler to a specific screen.
+ * \param base The base swc screen struct.
+ * \param handler The handler containing callback functions for screen events.
+ * \param data User-defined data to pass to the handler callbacks.
+ */
 EXPORT void
 swc_screen_set_handler(struct swc_screen *base, const struct swc_screen_handler *handler, void *data)
 {
 	struct screen *screen = INTERNAL(base);
 
-	screen->handler = handler;
+	/* Fallback to null_handler if NULL is passed to prevent dereference crashes */
+	screen->handler = handler ? handler : &null_handler;
 	screen->handler_data = data;
 }
 
+/**
+ * \brief Initializes the global screen list and requests DRM to create screens.
+ * \return true if screens were successfully created and initialized, false
+ * otherwise.
+ */
 bool
 screens_initialize(void)
 {
@@ -62,12 +83,12 @@ screens_initialize(void)
 	if (!drm_create_screens(&swc.screens))
 		return false;
 
-	if (wl_list_empty(&swc.screens))
-		return false;
-
-	return true;
+	return !wl_list_empty(&swc.screens);
 }
 
+/**
+ * \brief Destroys all currently active screens and cleans up the screen list.
+ */
 void
 screens_finalize(void)
 {
@@ -77,13 +98,21 @@ screens_finalize(void)
 		screen_destroy(screen);
 }
 
+/**
+ * \brief Binds a Wayland client to a screen resource.
+ * \param client The Wayland client requesting the bind.
+ * \param data The screen struct being bound.
+ * \param version The protocol version.
+ * \param id The ID for the new resource.
+ */
 static void
 bind_screen(struct wl_client *client, void *data, uint32_t version, uint32_t id)
 {
 	struct screen *screen = data;
-	struct wl_resource *resource;
+	if (!screen)
+		return;
 
-	resource = wl_resource_create(client, &swc_screen_interface, version, id);
+	struct wl_resource *resource = wl_resource_create(client, &swc_screen_interface, version, id);
 
 	if (!resource) {
 		wl_client_post_no_memory(client);
@@ -94,6 +123,13 @@ bind_screen(struct wl_client *client, void *data, uint32_t version, uint32_t id)
 	wl_list_insert(&screen->resources, wl_resource_get_link(resource));
 }
 
+/**
+ * \brief Allocates and initializes a new screen.
+ * \param crtc The DRM CRTC ID associated with this screen.
+ * \param output The primary output tied to this screen.
+ * \param cursor_plane The plane to be used for hardware cursors.
+ * \return A pointer to the newly allocated screen, or NULL on failure.
+ */
 struct screen *
 screen_new(uint32_t crtc, struct output *output, struct plane *cursor_plane)
 {
@@ -105,20 +141,23 @@ screen_new(uint32_t crtc, struct output *output, struct plane *cursor_plane)
 		x = MAX(x, screen->base.geometry.x + screen->base.geometry.width);
 
 	if (!(screen = malloc(sizeof(*screen))))
-		goto error0;
+		return NULL;
 
 	screen->global = wl_global_create(swc.display, &swc_screen_interface, 1, screen, &bind_screen);
 
 	if (!screen->global) {
 		ERROR("Failed to create screen global\n");
-		goto error1;
+		free(screen);
+		return NULL;
 	}
 
 	screen->crtc = crtc;
 
 	if (!primary_plane_initialize(&screen->planes.primary, crtc, output->preferred_mode, &output->connector, 1)) {
 		ERROR("Failed to initialize primary plane\n");
-		goto error2;
+		wl_global_destroy(screen->global);
+		free(screen);
+		return NULL;
 	}
 
 	cursor_plane->screen = screen;
@@ -138,15 +177,12 @@ screen_new(uint32_t crtc, struct output *output, struct plane *cursor_plane)
 	swc.manager->new_screen(&screen->base);
 
 	return screen;
-
-error2:
-	wl_global_destroy(screen->global);
-error1:
-	free(screen);
-error0:
-	return NULL;
 }
 
+/**
+ * \brief Tears down a screen, cleaning up its planes, outputs, and signals.
+ * \param screen The screen to destroy.
+ */
 void
 screen_destroy(struct screen *screen)
 {
@@ -154,16 +190,27 @@ screen_destroy(struct screen *screen)
 
 	if (active_screen == screen)
 		active_screen = NULL;
+
 	if (screen->handler->destroy)
 		screen->handler->destroy(screen->handler_data);
+
 	wl_signal_emit(&screen->destroy_signal, NULL);
 	wl_list_for_each_safe (output, next, &screen->outputs, link)
 		output_destroy(output);
+
 	primary_plane_finalize(&screen->planes.primary);
 	plane_destroy(screen->planes.cursor);
 	free(screen);
 }
 
+/**
+ * \brief Recalculates the usable geometry of a screen by applying screen modifiers.
+ *
+ * This is used to reserve space for panels, docks, or other UI elements that
+ * reduce the effective screen area available for standard windows.
+ *
+ * \param screen The screen whose geometry needs to be updated.
+ */
 void
 screen_update_usable_geometry(struct screen *screen)
 {
@@ -185,10 +232,9 @@ screen_update_usable_geometry(struct screen *screen)
 	extents = pixman_region32_extents(&total_usable);
 
 	if (extents->x1 != screen->base.usable_geometry.x
-	 || extents->y1 != screen->base.usable_geometry.y
-	 || (extents->x2 - extents->x1) != screen->base.usable_geometry.width
-	 || (extents->y2 - extents->y1) != screen->base.usable_geometry.height)
-	{
+	    || extents->y1 != screen->base.usable_geometry.y
+	    || (extents->x2 - extents->x1) != screen->base.usable_geometry.width
+	    || (extents->y2 - extents->y1) != screen->base.usable_geometry.height) {
 		screen->base.usable_geometry.x = extents->x1;
 		screen->base.usable_geometry.y = extents->y1;
 		screen->base.usable_geometry.width = extents->x2 - extents->x1;
@@ -197,8 +243,19 @@ screen_update_usable_geometry(struct screen *screen)
 		if (screen->handler->usable_geometry_changed)
 			screen->handler->usable_geometry_changed(screen->handler_data);
 	}
+
+	pixman_region32_fini(&usable);
+	pixman_region32_fini(&total_usable);
 }
 
+/**
+ * \brief Handles pointer motion to determine and update the active screen.
+ * \param handler The pointer handler context.
+ * \param time The timestamp of the motion event.
+ * \param fx The fixed-point X coordinate of the pointer.
+ * \param fy The fixed-point Y coordinate of the pointer.
+ * \return Always returns false, allowing the event to propagate further if needed.
+ */
 bool
 handle_motion(struct pointer_handler *handler, uint32_t time, wl_fixed_t fx, wl_fixed_t fy)
 {
